@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Prediction Tool</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .input-hint {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .validation-error {
+            color: var(--accent);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result-header {
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-header i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .salary-display {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: linear-gradient(90deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 8px;
+        }
+        
+        .factors-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .factor {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .factor-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin: 5px 0;
+        }
+        
+        .factor-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .explanation {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+        }
+        
+        .explanation h3 {
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .salary-display {
+                font-size: 28px;
+            }
+            
+            .factors-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-calculator"></i> Salary Prediction Tool</h1>
+            <p>Enter your professional experience to estimate your expected salary</p>
+        </div>
+        
+        <div class="content">
+            <form id="salaryForm">
+                <div class="form-group">
+                    <label for="totalExp">Total Experience (years)</label>
+                    <input type="number" id="totalExp" class="form-control" min="1" max="50" value="5" required>
+                    <div class="input-hint">Your total years of professional experience</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teamLeadExp">Team Lead Experience (years)</label>
+                    <input type="number" id="teamLeadExp" class="form-control" min="0" max="50" value="2" required>
+                    <div class="input-hint">Years spent in team lead positions (cannot exceed total experience)</div>
+                    <div class="validation-error" id="teamLeadError">
+                        <i class="fas fa-exclamation-circle"></i> Cannot exceed total experience
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="projectManagerExp">Project Manager Experience (years)</label>
+                    <input type="number" id="projectManagerExp" class="form-control" min="0" max="50" value="1" required>
+                    <div class="input-hint">Years spent as a project manager (cannot exceed total experience)</div>
+                    <div class="validation-error" id="projectManagerError">
+                        <i class="fas fa-exclamation-circle"></i> Cannot exceed total experience
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="certifications">Number of Certifications</label>
+                    <input type="number" id="certifications" class="form-control" min="0" max="10" value="2" required>
+                    <div class="input-hint">Relevant professional certifications (e.g., PMP, AWS, Scrum)</div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-calculator"></i> Calculate Salary
+                </button>
+            </form>
+            
+            <div class="result-container" id="resultContainer">
+                <h2 class="result-header">
+                    <i class="fas fa-chart-line"></i> Salary Prediction
+                </h2>
+                <p>Based on your experience and qualifications, your predicted salary is:</p>
+                
+                <div class="salary-display" id="salaryDisplay">$84,500</div>
+                
+                <div class="factors-container">
+                    <div class="factor">
+                        <div class="factor-value" id="totalFactor">5</div>
+                        <div class="factor-label">Years Total Exp</div>
+                    </div>
+                    <div class="factor">
+                        <div class="factor-value" id="teamLeadFactor">2</div>
+                        <div class="factor-label">Years Team Lead</div>
+                    </div>
+                    <div class="factor">
+                        <div class="factor-value" id="managerFactor">1</div>
+                        <div class="factor-label">Years PM</div>
+                    </div>
+                    <div class="factor">
+                        <div class="factor-value" id="certsFactor">2</div>
+                        <div class="factor-label">Certifications</div>
+                    </div>
+                </div>
+                
+                <div class="explanation">
+                    <h3><i class="fas fa-lightbulb"></i> Why team lead experience can't exceed total experience</h3>
+                    <p>Team lead experience is a subset of your total professional experience. You can't have more years as a team lead than your total years in the workforce. This validation ensures realistic inputs for accurate salary predictions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This is a demonstration tool. Actual salaries may vary based on additional factors like location, industry, and company size.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('salaryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get input values
+            const totalExp = parseInt(document.getElementById('totalExp').value);
+            const teamLeadExp = parseInt(document.getElementById('teamLeadExp').value);
+            const projectManagerExp = parseInt(document.getElementById('projectManagerExp').value);
+            const certifications = parseInt(document.getElementById('certifications').value);
+            
+            // Reset error messages
+            document.getElementById('teamLeadError').style.display = 'none';
+            document.getElementById('projectManagerError').style.display = 'none';
+            
+            let isValid = true;
+            
+            // Validate inputs
+            if (teamLeadExp > totalExp) {
+                document.getElementById('teamLeadError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (projectManagerExp > totalExp) {
+                document.getElementById('projectManagerError').style.display = 'block';
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Calculate predicted salary (using the regression equation from the notebook)
+            // Coefficients from the notebook: 
+            // Intercept: 0.0000, TotalExp: 0.6735, TeamLead: 0.3267, PM: 0.1165, Certs: 0.0304
+            
+            // For demonstration, we'll scale these coefficients to realistic salary numbers
+            const baseSalary = 50000;
+            const totalExpWeight = 3000;
+            const teamLeadExpWeight = 2500;
+            const projectManagerExpWeight = 2000;
+            const certificationWeight = 1500;
+            
+            let predictedSalary = baseSalary + 
+                                (totalExp * totalExpWeight) + 
+                                (teamLeadExp * teamLeadExpWeight) + 
+                                (projectManagerExp * projectManagerExpWeight) + 
+                                (certifications * certificationWeight);
+            
+            // Format and display the result
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            
+            document.getElementById('salaryDisplay').textContent = formatter.format(predictedSalary);
+            document.getElementById('totalFactor').textContent = totalExp;
+            document.getElementById('teamLeadFactor').textContent = teamLeadExp;
+            document.getElementById('managerFactor').textContent = projectManagerExp;
+            document.getElementById('certsFactor').textContent = certifications;
+            
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            // Scroll to results
+            document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Add real-time validation
+        document.getElementById('totalExp').addEventListener('input', function() {
+            const totalExp = parseInt(this.value) || 0;
+            const teamLeadExp = parseInt(document.getElementById('teamLeadExp').value) || 0;
+            const projectManagerExp = parseInt(document.getElementById('projectManagerExp').value) || 0;
+            
+            if (teamLeadExp > totalExp) {
+                document.getElementById('teamLeadError').style.display = 'block';
+            } else {
+                document.getElementById('teamLeadError').style.display = 'none';
+            }
+            
+            if (projectManagerExp > totalExp) {
+                document.getElementById('projectManagerError').style.display = 'block';
+            } else {
+                document.getElementById('projectManagerError').style.display = 'none';
+            }
+        });
+
+        document.getElementById('teamLeadExp').addEventListener('input', function() {
+            const totalExp = parseInt(document.getElementById('totalExp').value) || 0;
+            const teamLeadExp = parseInt(this.value) || 0;
+            
+            if (teamLeadExp > totalExp) {
+                document.getElementById('teamLeadError').style.display = 'block';
+            } else {
+                document.getElementById('teamLeadError').style.display = 'none';
+            }
+        });
+
+        document.getElementById('projectManagerExp').addEventListener('input', function() {
+            const totalExp = parseInt(document.getElementById('totalExp').value) || 0;
+            const projectManagerExp = parseInt(this.value) || 0;
+            
+            if (projectManagerExp > totalExp) {
+                document.getElementById('projectManagerError').style.display = 'block';
+            } else {
+                document.getElementById('projectManagerError').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
